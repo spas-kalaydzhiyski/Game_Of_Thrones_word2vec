@@ -18,13 +18,11 @@ import nltk
 import gensim.models.word2vec as w2v
 
 
-# --------------------------- Helper methods ----------------------------------------
+# --------------------------- Helper methods ---------------------------------------------------------------------------
 
 def download_nltk_tools():
     nltk.download('punkt')  # pre-trained tokenizer
     nltk.download('stopwords')
-
-# ------------------------------------------------------------------------------------
 
 
 def generate_corpus():
@@ -37,15 +35,13 @@ def generate_corpus():
     return corpus_raw_data
 
 
-# ------------------------------------------------------------------------------------
-
 # gets only the words from a sentence, removing any extra characters
 def sentence_to_wordlist(raw):
     clean = re.sub('[^A-Za-z]', ' ', raw)
     words = clean.split()
     return words
 
-# --------------------------- Helper methods ----------------------------------------
+# --------------------------- Helper methods (End) ---------------------------------------------------------------------
 
 
 def train(sentences):
@@ -66,7 +62,7 @@ def train(sentences):
     )
 
     got_corpus2vec.build_vocab(sentences)
-    vocab = got_corpus2vec.wv.vocab # all the words used in the corpus
+    vocab = got_corpus2vec.wv.vocab              # all the words used in the corpus
 
     num_examples = got_corpus2vec.corpus_count
     num_epochs = got_corpus2vec.iter
@@ -83,58 +79,8 @@ def main():
     corpus = generate_corpus()
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
     raw_sentences = tokenizer.tokenize(corpus)
-
-    sentences = []
-    for raw_sent in raw_sentences:
-        if raw_sent:
-            sentences.append(sentence_to_wordlist(raw_sent))
-
+    sentences = [sentence_to_wordlist(rs) for rs in raw_sentences if rs]
     train(sentences)
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
