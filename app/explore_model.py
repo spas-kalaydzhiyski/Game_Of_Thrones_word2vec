@@ -23,13 +23,14 @@ def save_matrix(word_vectors_matrix):
 
 def create_and_save_DataFrame(wv_matrix_2d, got_corpus2vec):
     # init
+    vocab = got_corpus2vec.wv.vocab
     points = pd.DataFrame(
         [
             (word, coordinates[0], coordinates[1])
             for word, coordinates in [
-            (word, wv_matrix_2d[got_corpus2vec.wv.vocab[word].index])
-            for word in got_corpus2vec.wv.vocab
-        ]
+                (word, wv_matrix_2d[vocab[word].index])
+                for word in vocab
+            ]
         ],
         columns=['word', 'x', 'y']
     )
@@ -77,18 +78,17 @@ def main():
     # create_and_save_DataFrame(word_vectors_matrix_2d, got_corpus2vec)
 
     # get points
+    points = []
     with open('points.pickle', 'rb') as f:
         points = pickle.load(f)
 
     sns.set_context("poster")
-    points.plot.scatter('x', 'y', s=10, figsize=(20, 12))
 
-    plot_region(points, x_bounds=(4.0, 4.2), y_bounds=(-0.5, -0.1))
-    plot_region(points, x_bounds=(0, 1), y_bounds=(4, 4.5))
+    # TODO: plot the coordinates
 
-    most_similar_list = got_corpus2vec.most_similar('Cersei')
-    for i in most_similar_list:
-        print(i)
+    # most_similar_list = got_corpus2vec.most_similar('Cersei')
+    # for i in most_similar_list:
+    #     print(i)
 
     # got_corpus2vec.most_similar('Jamie')
     # got_corpus2vec.most_similar('direwolf')
