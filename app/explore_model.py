@@ -12,14 +12,25 @@ import matplotlib.pyplot as plt
 import pandas as pd
 # used for visualization
 import seaborn as sns
+# used for serialization
+import pickle
+
+
+# def save_matrix(word_vectors_matrix):
+#     with open('word_vectors_matrix_2d.pickle', 'wb') as matrix_file:
+#         pickle._dump(word_vectors_matrix, matrix_file)
 
 
 def main():
     got_corpus2vec = w2v.Word2Vec.load(os.path.join('trained_model', 'got_model.w2v'))
     tSNE = sklearn.manifold.TSNE(n_components=2, random_state=0)
-    word_vectors_matrix = got_corpus2vec.wv.syn0
-    word_vectors_matrix_2d = tSNE.fit_transform(word_vectors_matrix)
+    #word_vectors_matrix = got_corpus2vec.wv.syn0
+    # word_vectors_matrix_2d = tSNE.fit_transform(word_vectors_matrix)
+    #
+    # save_matrix(word_vectors_matrix_2d)
 
+    with open('word_vectors_matrix_2d.pickle', 'rb') as f:
+        word_vectors_matrix_2d = pickle.load(f)
     # points for plotting in 2d space
     points = pd.DataFrame(
         [
