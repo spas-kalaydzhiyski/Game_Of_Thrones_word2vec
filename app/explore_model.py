@@ -16,9 +16,50 @@ import seaborn as sns
 import pickle
 
 
-# def save_matrix(word_vectors_matrix):
-#     with open('word_vectors_matrix_2d.pickle', 'wb') as matrix_file:
-#         pickle._dump(word_vectors_matrix, matrix_file)
+def save_matrix(word_vectors_matrix):
+    with open('word_vectors_matrix_2d.pickle', 'wb') as matrix_file:
+        pickle._dump(word_vectors_matrix, matrix_file)
+
+
+def create_and_save_DataFrame(wv_matrix_2d, got_corpus2vec):
+    # init
+    points = pd.DataFrame(
+        [
+            (word, coordinates[0], coordinates[1])
+            for word, coordinates in [
+            (word, wv_matrix_2d[got_corpus2vec.wv.vocab[word].index])
+            for word in got_corpus2vec.wv.vocab
+        ]
+        ],
+        columns=['word', 'x', 'y']
+    )
+
+    # save
+    with open('points.pickle', 'wb') as f:
+        pickle.dump(points, f)
+
+
+def plot_region(points, x_bounds, y_bounds):
+    slice = points[
+        (x_bounds[0] <= points.x) &
+        (points.x <= x_bounds[1]) &
+        (y_bounds[0] <= points.y) &
+        (points.y <= y_bounds[1])
+    ]
+
+    ax = slice.plot.scatter("x", "y", s=35, figsize=(10, 8))
+    for i, point in slice.iterrows():
+        ax.text(point.x + 0.005, point.y + 0.005, point.word, fontsize=11)
+
+
+def nearest_similarity_cosmul(got_corpus2vec, start1, end1, end2):
+    similarities = got_corpus2vec.most_similar_cosmul(
+        positive=[end2, start1],
+        negative=[end1]
+    )
+    start2 = similarities[0][0]
+    print("{start1} is related to {end1}, as {start2} is related to {end2}".format(**locals()))
+    return start2
 
 
 def main():
@@ -29,21 +70,30 @@ def main():
     #
     # save_matrix(word_vectors_matrix_2d)
 
+    # get matrix
     with open('word_vectors_matrix_2d.pickle', 'rb') as f:
         word_vectors_matrix_2d = pickle.load(f)
-    # points for plotting in 2d space
-    points = pd.DataFrame(
-        [
-            (word, coordinates[0], coordinates[1])
-            for word, coordinates in [
-                (word, word_vectors_matrix_2d[got_corpus2vec.wv.vocab[word].index])
-                for word in got_corpus2vec.wv.vocab
-            ]
-        ],
-        columns=['word', 'x', 'y']
-    )
 
-    print(points.head(10))
+    # create_and_save_DataFrame(word_vectors_matrix_2d, got_corpus2vec)
+
+    # get points
+    with open('points.pickle', 'rb') as f:
+        points = pickle.load(f)
+
+    sns.set_context("poster")
+    points.plot.scatter('x', 'y', s=10, figsize=(20, 12))
+
+    plot_region(points, x_bounds=(4.0, 4.2), y_bounds=(-0.5, -0.1))
+    plot_region(points, x_bounds=(0, 1), y_bounds=(4, 4.5))
+
+    most_similar_list = got_corpus2vec.most_similar('Cersei')
+    for i in most_similar_list:
+        print(i)
+
+    # got_corpus2vec.most_similar('Jamie')
+    # got_corpus2vec.most_similar('direwolf')
+
+    # nearest_similarity_cosmul(got_corpus2vec, "Stark", "Winterfell", "Riverrun")
 
 if __name__ == '__main__':
     main()
